@@ -1,5 +1,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+from views.category_requests import get_all_categories
+from views.post_requests import get_all_posts, get_post_by_search, get_single_post
+from views.tag_requests import get_all_tags
 
 from views.user import create_user, login_user
 
@@ -7,23 +10,33 @@ from views.user import create_user, login_user
 class HandleRequests(BaseHTTPRequestHandler):
     """Handles the requests to this server"""
 
-    def parse_url(self):
-        """Parse the url into the resource and id"""
-        path_params = self.path.split('/')
+    def parse_url(self, path):
+        path_params = path.split("/")
         resource = path_params[1]
-        if '?' in resource:
-            param = resource.split('?')[1]
-            resource = resource.split('?')[0]
-            pair = param.split('=')
-            key = pair[0]
-            value = pair[1]
-            return (resource, key, value)
+
+        # Check if there is a query string parameter
+        if "?" in resource:
+            # GIVEN: /customers?email=jenna@solis.com
+
+            param = resource.split("?")[1]  # email=jenna@solis.com
+            resource = resource.split("?")[0]  # 'customers'
+            pair = param.split("=")  # [ 'email', 'jenna@solis.com' ]
+            key = pair[0]  # 'email'
+            value = pair[1]  # 'jenna@solis.com'
+
+            return ( resource, key, value )
+
+        # No query string parameter
         else:
             id = None
+
             try:
                 id = int(path_params[2])
-            except (IndexError, ValueError):
-                pass
+            except IndexError:
+                pass  # No route parameter exists: /animals
+            except ValueError:
+                pass  # Request had trailing slash: /animals/
+
             return (resource, id)
 
     def _set_headers(self, status):
@@ -50,8 +63,42 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        """Handle Get requests to the server"""
-        pass
+        self._set_headers(200)
+
+        response = {}
+
+        # Parse URL and store entire tuple in a variable
+        parsed = self.parse_url(self.path)
+
+        # Response from parse_url() is a tuple with 2
+        # items in it, which means the request was for
+        # `/animals` or `/animals/2`
+        if len(parsed) == 2:
+            ( resource, id ) = parsed
+
+            if resource == "posts":
+                if id is not None:
+                    response = f"{get_single_post(id)}"
+                else:
+                    response = f"{get_all_posts()}"
+            
+            if resource == "categories":
+                if id is not None:
+                    response = f"{get_all_categories()}"
+                
+            
+            if resource == "tags":
+                if id is not None:
+                    response = f"{get_all_tags()}"
+                            
+        elif len(parsed) == 3:
+            ( resource, key, value ) = parsed
+
+            
+            if key == "q" and resource == "posts":
+                response = get_post_by_search(value)
+                
+        self.wfile.write(response.encode())
 
 
     def do_POST(self):
