@@ -1,6 +1,5 @@
 import sqlite3
 import json
-from unicodedata import category
 from models import Category
 
 def get_all_categories():
