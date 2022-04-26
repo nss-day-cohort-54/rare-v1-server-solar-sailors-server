@@ -38,7 +38,7 @@ def get_all_posts():
         for row in dataset:
 
             
-            post = Post(row['id'], row['user_id'], row['category_id'], row['title'] , row['publication_date'], row['image_url'], row['content'], row['approved'] )
+            post = Post(row['id'], row['user_id'], row['category_id'], row['title'] , row['publication_date'], row['image_url'], row['content'] )
             
             category = Category(row['cat_id'], row['label'])
             
@@ -88,7 +88,9 @@ def get_single_post(id):
             p.publication_date,
             p.image_url,
             p.content,
-            p.approved
+            p.approved,
+            c.id cat_id,
+            c.label
         FROM Posts p
         JOIN Categories c
         ON c.id = p.category_id
@@ -98,7 +100,7 @@ def get_single_post(id):
         data = db_cursor.fetchone()
 
         # Create an post instance from the current row
-        post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'], data['approved'] )
+        post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'])
             
         category = Category(data['id'], data['label'])
         
@@ -146,8 +148,8 @@ def create_post(new_post):
         INSERT INTO Entries
             ( category_id, title, image_url, content, approved, )
         VALUES
-            ( ?, ?, ?, ?, ? );
-        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], new_post['approved'], ))
+            ( ?, ?, ?, ? );
+        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], ))
 
         # The `lastrowid` property on the cursor will return
         # the primary key of the last thing that got added to
@@ -179,10 +181,9 @@ def update_post(id, new_post):
                 category_id = ?,
                 title = ?,
                 image_url = ?,
-                content = ?,
-                approved = ?
+                content = ?
         WHERE id = ?
-        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], new_post['approved'], id, ))
+        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], id, ))
 
         # Were any rows affected?
         # Did the client send an `id` that exists?
