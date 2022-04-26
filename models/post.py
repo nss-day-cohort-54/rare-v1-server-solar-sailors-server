@@ -7,3 +7,4 @@ class Post():
         self.publication_date = publication_date
         self.image_url = image_url
         self.content = content
+        self.approved = 1

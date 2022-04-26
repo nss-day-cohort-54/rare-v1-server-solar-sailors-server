@@ -20,6 +20,7 @@ def get_all_posts():
             p.publication_date,
             p.image_url,
             p.content,
+            p.approved,
             c.id cat_id,
             c.label
         FROM Posts p
@@ -37,7 +38,7 @@ def get_all_posts():
         for row in dataset:
 
             
-            post = Post(row['id'], row['user_id'], row['category_id'], row['title'] , row['publication_date'], row['image_url'], row['content'] )
+            post = Post(row['id'], row['user_id'], row['category_id'], row['title'] , row['publication_date'], row['image_url'], row['content'], row['approved'] )
             
             category = Category(row['cat_id'], row['label'])
             
@@ -86,7 +87,8 @@ def get_single_post(id):
             p.title,
             p.publication_date,
             p.image_url,
-            p.content
+            p.content,
+            p.approved
         FROM Posts p
         JOIN Categories c
         ON c.id = p.category_id
@@ -96,7 +98,7 @@ def get_single_post(id):
         data = db_cursor.fetchone()
 
         # Create an post instance from the current row
-        post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'] )
+        post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'], data['approved'] )
             
         category = Category(data['id'], data['label'])
         
@@ -119,7 +121,8 @@ def get_post_by_search(string_variable):
             p.title,
             p.publication_date,
             p.image_url,
-            p.content
+            p.content,
+            p.approved
         FROM Posts p
         WHERE p.post LIKE ?
         """, ( '%'+ string_variable +'%', ))
@@ -129,7 +132,7 @@ def get_post_by_search(string_variable):
         dataset = db_cursor.fetchall()
 
         for data in dataset:
-            post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'] )
+            post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'], data['approved'] )
             
             posts.append(post.__dict__)
 
@@ -141,10 +144,10 @@ def create_post(new_post):
 
         db_cursor.execute("""
         INSERT INTO Entries
-            ( category_id, title, image_url, content )
+            ( category_id, title, image_url, content, approved, )
         VALUES
-            ( ?, ?, ?, ? );
-        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], ))
+            ( ?, ?, ?, ?, ? );
+        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], new_post['approved'], ))
 
         # The `lastrowid` property on the cursor will return
         # the primary key of the last thing that got added to
@@ -176,9 +179,10 @@ def update_post(id, new_post):
                 category_id = ?,
                 title = ?,
                 image_url = ?,
-                content = ?
+                content = ?,
+                approved = ?
         WHERE id = ?
-        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], id, ))
+        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], new_post['approved'], id, ))
 
         # Were any rows affected?
         # Did the client send an `id` that exists?

@@ -90,3 +90,5 @@ INSERT INTO Reactions ('label', 'image_url') VALUES ('happy', 'https://pngtree.c
 
 
 INSERT INTO `Posts` VALUES (null, 1, 1, "Title Test", null, "Image Test", "Content Test", true);
+
+INSERT INTO `PostTags` VALUES (null, 1, 1 )
