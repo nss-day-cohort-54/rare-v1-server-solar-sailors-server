@@ -1,8 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from views.category_requests import get_all_categories
+from views.category_requests import get_all_categories, get_single_category
+from views.comment_requests import get_all_comments, get_single_comment
 from views.post_requests import get_all_posts, get_post_by_search, get_single_post
-from views.tag_requests import get_all_tags
+from views.tag_requests import get_all_tags, get_single_tag
 
 from views.user import create_user, login_user
 
@@ -84,12 +85,21 @@ class HandleRequests(BaseHTTPRequestHandler):
             
             if resource == "categories":
                 if id is not None:
+                    response = f"{get_single_category(id)}"
+                else:
                     response = f"{get_all_categories()}"
-                
-            
+                    
             if resource == "tags":
                 if id is not None:
+                    response = f"{get_single_tag(id)}"
+                else:
                     response = f"{get_all_tags()}"
+            
+            if resource == "comments":
+                if id is not None:
+                    response = f"{get_single_comment(id)}"
+                else:
+                    response = f"{get_all_comments()}"        
                             
         elif len(parsed) == 3:
             ( resource, key, value ) = parsed
