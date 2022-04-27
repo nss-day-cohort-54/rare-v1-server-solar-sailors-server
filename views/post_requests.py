@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Post, Category, Tag
+from models import Post, Category, Tag, Reaction
 
 def get_all_posts():
     # Open a connection to the database
@@ -94,11 +94,16 @@ def get_single_post(id):
         FROM Posts p
         JOIN Categories c
         ON c.id = p.category_id
-        """)
+        JOIN PostReactions pr
+        ON pr.post_id = p.id
+        LEFT JOIN Reactions r
+        ON pr.reaction_id = r.id
+        WHERE pr.post_id = ?
+        """, (id, ))
 
         # Load the single result into memory
         data = db_cursor.fetchone()
-
+        
         # Create an post instance from the current row
         post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'])
             
@@ -145,7 +150,7 @@ def create_post(new_post):
         db_cursor = conn.cursor()
 
         db_cursor.execute("""
-        INSERT INTO Entries
+        INSERT INTO Post
             ( category_id, title, image_url, content, approved, )
         VALUES
             ( ?, ?, ?, ? );
