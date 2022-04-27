@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from views.category_requests import get_all_categories, get_single_category, delete_category, update_category
-from views.comment_requests import get_all_comments, get_single_comment, delete_comment
+from views.comment_requests import get_all_comments, get_single_comment, delete_comment, update_comment
 from views.post_requests import get_all_posts, get_post_by_search, get_single_post, delete_post, create_post, update_post
 from views.tag_requests import get_all_tags, get_single_tag, delete_tag, create_tag
 
@@ -152,7 +152,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         
         if resource == "categories":
             success = update_category(id, post_body) 
-
+            
+        if resource == "comments":
+            success = update_comment(id, post_body) 
         if success:
             self._set_headers(204)
         else:

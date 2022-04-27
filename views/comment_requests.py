@@ -64,7 +64,25 @@ def create_comment(new_comment):
         new_comment['id'] = id
 
     return json.dumps(new_comment)
-    
+
+def update_comment(id, new_comment):
+    with sqlite3.connect("./db.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Comments
+            SET
+                content = ?
+        WHERE id = ?
+        """, (new_comment['content'], id, ))
+
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        return False
+    else:
+        return True
+
 def delete_comment(id):
     with sqlite3.connect("./db.sqlite3") as conn:
             db_cursor = conn.cursor()
