@@ -88,8 +88,10 @@ INSERT INTO Categories ('label') VALUES ('News');
 INSERT INTO Tags ('label') VALUES ('JavaScript');
 INSERT INTO Reactions ('label', 'image_url') VALUES ('happy', 'https://pngtree.com/so/happy');
 
-
-INSERT INTO `Posts` VALUES (null, 1, 1, "Title Test", null, "Image Test", "Content Test", true);
+UPDATE `Posts`
+SET publication_date = 2012
+WHERE id = 2
+INSERT INTO `Posts` VALUES (null, 1, 1, "Title Test 2", null, "Image Test 2", "Content Test 2", true);
 
 INSERT INTO `PostTags` VALUES (null, 1, 1 )
 

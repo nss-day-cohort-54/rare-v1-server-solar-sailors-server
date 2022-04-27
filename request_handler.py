@@ -15,6 +15,12 @@ class HandleRequests(BaseHTTPRequestHandler):
         path_params = path.split("/")
         resource = path_params[1]
 
+        # Add conditional statement that checks to see if ? and & are in resource
+        # if "?" and "&" in resource:
+        #     param = resource.split("?"[1])
+        #     resource = resource.split("?")[0]
+            # if they are, split up the url and return the strings as variables inside a tuple
+        
         # Check if there is a query string parameter
         if "?" in resource:
             # GIVEN: /customers?email=jenna@solis.com
@@ -107,6 +113,9 @@ class HandleRequests(BaseHTTPRequestHandler):
             
             if key == "q" and resource == "posts":
                 response = get_post_by_search(value)
+                
+            # if key == "expand" and resource == "posts":
+            #     response = f"{get_all_posts}"
                 
         self.wfile.write(response.encode())
 
