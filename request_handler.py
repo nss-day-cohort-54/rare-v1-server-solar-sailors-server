@@ -1,9 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from views.category_requests import get_all_categories, get_single_category
-from views.comment_requests import get_all_comments, get_single_comment
-from views.post_requests import get_all_posts, get_post_by_search, get_single_post
-from views.tag_requests import get_all_tags, get_single_tag
+from views.category_requests import get_all_categories, get_single_category, delete_category
+from views.comment_requests import get_all_comments, get_single_comment, delete_comment
+from views.post_requests import get_all_posts, get_post_by_search, get_single_post, delete_post
+from views.tag_requests import get_all_tags, get_single_tag, delete_tag
 
 from views.user import create_user, login_user
 
@@ -131,8 +131,27 @@ class HandleRequests(BaseHTTPRequestHandler):
         pass
 
     def do_DELETE(self):
-        """Handle DELETE Requests"""
-        pass
+        # Set a 204 response code
+        self._set_headers(204)
+
+        # Parse the URL
+        (resource, id) = self.parse_url(self.path)
+
+        # Delete a single animal from the list
+        if resource == "posts":
+            delete_post(id)
+        
+        if resource == "categories":
+            delete_category(id)    
+        
+        if resource == "tags":
+            delete_tag(id)
+        
+        if resource == "comments":
+            delete_comment(id)          
+
+        # Encode the new animal and send in response
+        self.wfile.write("".encode())
 
 
 def main():
