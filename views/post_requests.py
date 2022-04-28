@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Post, Category, Tag, Reaction
+from models import Post, Category, Tag, User
 
 def get_all_posts():
     # Open a connection to the database
@@ -22,10 +22,14 @@ def get_all_posts():
             p.content,
             p.approved,
             c.id cat_id,
-            c.label
+            c.label,
+            u.first_name,
+            u.last_name
         FROM Posts p
         JOIN Categories c
         ON c.id = p.category_id
+        JOIN Users u
+        ON u.id = p.user_id
         """)
 
         # Initialize an empty list to hold all post representations
@@ -38,9 +42,11 @@ def get_all_posts():
         for row in dataset:
 
             
-            post = Post(row['id'], row['user_id'], row['category_id'], row['title'] , row['publication_date'], row['image_url'], row['content'] )
+            post = Post(row['id'], row['user_id'], row['category_id'], row['title'], row['publication_date'], row['image_url'], row['content'] )
             
             category = Category(row['cat_id'], row['label'])
+            
+            user = User(row['first_name'], row['last_name'])
             
             tags =[]
             
@@ -67,6 +73,8 @@ def get_all_posts():
             
             post.category = category.__dict__
             
+            post.user = user.__dict__
+            
             posts.append(post.__dict__)
 
     # Use `json` package to properly serialize list as JSON
@@ -90,10 +98,14 @@ def get_single_post(id):
             p.content,
             p.approved,
             c.id cat_id,
-            c.label
+            c.label,
+            u.first_name,
+            u.last_name
         FROM Posts p
         JOIN Categories c
         ON c.id = p.category_id
+        JOIN Users u
+        ON u.id = p.user_id
         JOIN PostReactions pr
         ON pr.post_id = p.id
         LEFT JOIN Reactions r
@@ -108,6 +120,10 @@ def get_single_post(id):
         post = Post(data['id'], data['user_id'], data['category_id'], data['title'] , data['publication_date'], data['image_url'], data['content'])
             
         category = Category(data['id'], data['label'])
+        
+        user = User(row['first_name'], row['last_name'])
+        
+        post.user = user.__dict__
         
         post.category = category.__dict__
         
@@ -150,11 +166,11 @@ def create_post(new_post):
         db_cursor = conn.cursor()
 
         db_cursor.execute("""
-        INSERT INTO Post
-            ( category_id, title, image_url, content, approved, )
+        INSERT INTO Posts
+            ( user_id, category_id, title, publication_date, image_url, content, approved, )
         VALUES
-            ( ?, ?, ?, ? );
-        """, (new_post['category_id'], new_post['title'], new_post['image_url'] , new_post['content'], ))
+            ( ?, ?, ?, ?, ?, ? );
+        """, (new_post['user_id'], new_post['category_id'], new_post['title'], new_post['publication_date'], new_post['image_url'] , new_post['content'], ))
 
         # The `lastrowid` property on the cursor will return
         # the primary key of the last thing that got added to
