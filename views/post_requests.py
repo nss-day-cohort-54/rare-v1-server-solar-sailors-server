@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Post, Category, Tag, User, Reaction
+from models import Post, Category, Tag, User
 
 def get_all_posts():
     # Open a connection to the database
