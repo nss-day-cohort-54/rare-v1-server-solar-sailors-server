@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from views.category_requests import get_all_categories, get_single_category, delete_category, update_category
 from views.comment_requests import get_all_comments, get_single_comment, delete_comment, update_comment
-from views.post_requests import get_all_posts, get_post_by_search, get_single_post, delete_post, create_post, update_post
+from views.post_requests import get_all_posts, get_post_by_search, get_single_post, delete_post, create_post, update_post, get_post_by_user_id
 from views.tag_requests import get_all_tags, get_single_tag, delete_tag, create_tag
 
 from views.user import create_user, login_user
@@ -31,6 +31,12 @@ class HandleRequests(BaseHTTPRequestHandler):
             key = pair[0]  # 'email'
             value = pair[1]  # 'jenna@solis.com'
 
+            try:
+                value = int(pair[1])
+            except IndexError:
+                pass  # No route parameter exists: /animals
+            except ValueError:
+                pass  # Request had trailing slash: /animals/
             return ( resource, key, value )
 
         # No query string parameter
@@ -114,8 +120,10 @@ class HandleRequests(BaseHTTPRequestHandler):
             if key == "q" and resource == "posts":
                 response = get_post_by_search(value)
                 
+            if key == "user_id" and resource == "posts":
+                response = get_post_by_user_id(value)
             # if key == "expand" and resource == "posts":
-            #     response = f"{get_all_posts}"
+            #     response = f"{get_all_posts(value)}"
                 
         self.wfile.write(response.encode())
 

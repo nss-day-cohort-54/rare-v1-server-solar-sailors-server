@@ -121,7 +121,7 @@ def get_single_post(id):
             
         category = Category(data['id'], data['label'])
         
-        user = User(row['first_name'], row['last_name'])
+        user = User(data['first_name'], data['last_name'])
         
         post.user = user.__dict__
         
@@ -159,6 +159,81 @@ def get_post_by_search(string_variable):
             
             posts.append(post.__dict__)
 
+    return json.dumps(posts)
+
+def get_post_by_user_id(id):
+    with sqlite3.connect("./db.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        
+        db_cursor.execute("""
+        SELECT
+            p.id,
+            p.user_id,
+            p.category_id,
+            p.title,
+            p.publication_date,
+            p.image_url,
+            p.content,
+            p.approved,
+            c.id cat_id,
+            c.label,
+            u.first_name,
+            u.last_name
+        FROM Posts p
+        JOIN Categories c
+        ON c.id = p.category_id
+        JOIN Users u
+        ON u.id = p.user_id
+        WHERE p.user_id = ?
+        """, (id, ))
+
+        # Initialize an empty list to hold all post representations
+        posts = []
+
+        # Convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        # Iterate list of data returned from database
+        for row in dataset:
+
+            
+            post = Post(row['id'], row['user_id'], row['category_id'], row['title'], row['publication_date'],
+                        row['image_url'], row['content'] )
+            
+            category = Category(row['cat_id'], row['label'])
+            
+            user = User(row['first_name'], row['last_name'])
+            
+            tags =[]
+            
+            db_cursor.execute(""" 
+                            SELECT
+                                t.id,
+                                t.label tag_label
+                            FROM Posts p
+                            JOIN PostTags pt
+                            ON pt.post_id = p.id
+                            LEFT JOIN Tags t
+                            ON pt.tag_id = t.id
+                            WHERE pt.post_id = ?
+                            """, ( post.id, ))
+            
+            post_tags = db_cursor.fetchall()
+            
+            for pt in post_tags:
+                tag = Tag(pt['id'], pt['tag_label'])
+                tag = tag.__dict__
+                tags.append(tag)
+            
+            post.tags = tags
+            
+            post.category = category.__dict__
+            
+            post.user = user.__dict__
+            
+            posts.append(post.__dict__)
+            
     return json.dumps(posts)
 
 def create_post(new_post):
