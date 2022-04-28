@@ -38,7 +38,8 @@ CREATE TABLE "Posts" (
   "publication_date" date,
   "image_url" varchar,
   "content" varchar,
-  "approved" bit
+  "approved" bit,
+  FOREIGN KEY(`user_id`) REFERENCES `Users`(`id`)
 );
 
 CREATE TABLE "Comments" (
@@ -96,3 +97,8 @@ INSERT INTO `Posts` VALUES (null, 1, 1, "Title Test 2", null, "Image Test 2", "C
 INSERT INTO `PostTags` VALUES (null, 1, 1 )
 
 INSERT INTO `Comments` VALUES (null, 1, 1, "Comment Test" )
+
+ALTER TABLE Posts
+ADD FOREIGN KEY (user_id) REFERENCES `Users` (id);
+
+DROP TABLE `Posts`;
