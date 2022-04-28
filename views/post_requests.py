@@ -2,6 +2,8 @@ import sqlite3
 import json
 from models import Post, Category, Tag, User
 
+# new changes to allow a git push
+
 def get_all_posts():
     # Open a connection to the database
     with sqlite3.connect("./db.sqlite3") as conn:
