@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from views.category_requests import get_all_categories, get_single_category, delete_category, update_category
+from views.category_requests import create_category, get_all_categories, get_single_category, delete_category, update_category
 from views.comment_requests import get_all_comments, get_single_comment, delete_comment, update_comment
 from views.post_requests import get_all_posts, get_post_by_search, get_single_post, delete_post, create_post, update_post, get_post_by_user_id
 from views.tag_requests import get_all_tags, get_single_tag, delete_tag, create_tag
@@ -151,6 +151,11 @@ class HandleRequests(BaseHTTPRequestHandler):
             new_tag = None
             if resource == 'tags':
                 new_tag = create_tag(post_body)
+            self.wfile.write(f"{new_tag}".encode())
+
+            new_category = None
+            if resource == 'categories':
+                new_category = create_category(post_body)
             self.wfile.write(f"{new_tag}".encode())
 
 
